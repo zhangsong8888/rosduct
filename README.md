@@ -1,14 +1,14 @@
 # rosduct
 
-*ROSduct*, the duct of ROS messages. ROSduct acts as a proxy to expose ROS topics, services and parameters from a remote `roscore` into a local `roscore` via the [rosbridge protocol](https://github.com/RobotWebTools/rosbridge_suite/blob/develop/ROSBRIDGE_PROTOCOL.md).
+*ROSduct*, ROS信息的管道。ROSduct充当代理，通过[rosbridge协议]（https://github.com/RobotWebTools/rosbridge-suite/blob/develop/rosbridge-protocol.md）将ROS主题、服务和参数从远程“roscore”公开到本地“roscore”。
 
-Say you have a ROS enabled robot in your network and you want to communicate with it but you have a network configuration that does not allow direct communication (for example, from inside a Docker container). With ROSduct you can configure a set of topics, services and parameters (action servers too, as they are implemented internally as topics) to expose in the local roscore to transparently send and receive ROS traffic to the robot ones.
+假设你的网络中有一个启用了ROS的机器人，你想与它通信，但是你的网络配置不允许直接通信（例如，从Docker容器内部）。使用ROSduct，您可以配置一组主题、服务和参数（操作服务器也是，因为它们在内部实现为主题），以便在本地roscore中公开，以便透明地向机器人发送和接收ROS流量。
 
 TODO: Image explaining it.
 
 # Usage
-Fill up YAML file with your topic publishers, subscribers, service servers to access, service servers to expose and parameters. Also the IP and port of the ROSbridge websocket server.
 
+用主题发布者、订阅者、要访问的服务服务器、要公开的服务服务器和参数填充YAML文件。也是ROSbridge websocket服务器的IP和端口。
 ```yaml
 # ROSbridge websocket server info
 rosbridge_ip: 192.168.1.31
@@ -40,7 +40,7 @@ parameter_polling_hz: 1
 **Note**: Don't add to remote or local topics the topic `/rosout`.
 
 # Example usage with Docker
-This tool came to be mainly to solve a problem with Docker containers. If you are running the Docker container that wants bidirectional communication with a ROS robot, and you are using Linux you can just add `--net host` to your `docker run` command (just after run). But if you are using a Mac [this won't work](https://github.com/docker/for-mac/issues/68). To work around it you can use this package.
+这个工具主要是用来解决Docker容器的问题。如果您运行的Docker容器需要与ROS robot进行双向通信，并且您使用的是Linux，那么您只需在“Docker run”命令中添加“--net host”（运行后）。但是如果你使用的是Mac[这行不通]（https://github.com/docker/for Mac/issues/68）。为了解决这个问题，你可以使用这个软件包。
 
 Just get in your Docker image rosduct:
 
@@ -53,8 +53,7 @@ catkin_make
 . devel/setup.bash
 ```
 
-And make a launchfile that configures it to expose your needed topics/services. For example, for a tool that interacts with `move_base` you could have a launchfile like:
-
+创建一个launchfile，将其配置为公开所需的主题/服务。例如，对于与“move_base”交互的工具，可以有如下启动文件：
 ```xml
 <launch>
   <node pkg="rosduct" name="rosduct" type="rosduct_main.py" output="screen">
@@ -89,6 +88,6 @@ And make a launchfile that configures it to expose your needed topics/services. 
 </launch>
 ```
 
-So you run your Docker image exposing port 9090 (for rosbridge communication) `docker run -p 9090:9090 -it your_docker_image` and you run the previous launchfile before running your ROS node.
+所以你运行你的Docker镜像暴露端口9090（用于rosbridge通信）`Docker run-p 9090:9090-it你的Docker镜像`并且在运行你的ROS节点之前运行上一个launchfile。
 
-To build the config you can do `rosnode info YOUR_NODE` and check the Publications (`local_topics`) and Subscriptions (`remote_topics`) and Services (`local_services`). For filling up remote_services you need to know what services your node calls.
+要构建配置，可以执行“rosnode info YOUR_NODE”，并检查发布（`local_topics`）和订阅（`remote_topics`）以及服务（`local_Services`）。要填充远程服务，您需要知道节点调用的服务。
